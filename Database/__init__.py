@@ -1,9 +1,9 @@
-from .config import metadata, engine
+from Database.models.groups import Groups
 from Database.models.students import Students
+from Database.models.teachers import Teachers
 from Database.models.users import Users
+from .config import metadata, engine, Base
 
 
 def init():
-    if len(metadata.sorted_tables) == 0:
-        raise Exception("In __init__.py must be included tables")
-    metadata.create_all(engine)
+    Base.metadata.create_all(engine)

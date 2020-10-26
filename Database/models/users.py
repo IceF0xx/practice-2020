@@ -1,11 +1,11 @@
-from Database.config import metadata
-from sqlalchemy import Column, Integer, String, Boolean, Table
+from sqlalchemy import Column, Integer, String, Boolean
+
+from Database.config import Base
 
 
-Users = Table('users', metadata,
-    Column('id', Integer, primary_key=True),
-    Column('username', String, unique=True),
-    Column('is_admin', Boolean)
-)
+class Users(Base):
+    __tablename__ = 'users'
 
-print(2)
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True)
+    is_admin = Column(Boolean)

@@ -1,15 +1,22 @@
-from sqlalchemy import Column, Integer, String, Boolean, Date, Text, Table
-from Database.config import metadata
+from sqlalchemy import Column, Integer, String, Boolean, Date, Text, ForeignKey
 
-Students = Table('students', metadata,
-    Column('student_id', Integer, primary_key=True),
-    Column('record_id', Integer, unique=True),
-    Column('first_name', String, nullable=False),       # Имя
-    Column('second_name', String, nullable=False),      # Фамилия
-    Column('last_name', String),                        # Отчество
-    Column('sex', Boolean),
-    Column('dob', Date),
-    Column('address', String),
-    Column('phone', String),
-    Column('parents', Text),
-)
+from Database.config import Base
+
+
+class Students(Base):
+    __tablename__ = 'students'
+
+    student_id = Column(Integer, primary_key=True)
+    record_id = Column(Integer, unique=True)
+    first_name = Column(String, nullable=False)  # Имя
+    second_name = Column(String, nullable=False)  # Фамилия
+    last_name = Column(String)  # Отчество
+    sex = Column(Boolean)
+    dob = Column(Date)
+    address = Column(String)
+    phone = Column(String)
+    parents = Column(Text)
+    group_id = Column(String, ForeignKey('groups.id'))
+
+    def __repr__(self):
+        return f'<Student(ID={self.student_id}, First Name={self.first_name}, Second Name={self.second_name})>'
