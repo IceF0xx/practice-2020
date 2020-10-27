@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, String, ForeignKey
 
 from Database.config import Base
 
@@ -6,8 +6,7 @@ from Database.config import Base
 class Groups(Base):
     __tablename__ = 'groups'
 
-    id = Column(String, primary_key=True)
-    curator_id = Column(Integer, ForeignKey('teachers.id'))
+    id = Column(String, ForeignKey('students.group_id'), primary_key=True)
     specialization = Column(String)
 
     def __repr__(self):

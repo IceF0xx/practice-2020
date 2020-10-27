@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, Date, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, Date
 
 from Database.config import Base
 
@@ -15,8 +15,7 @@ class Students(Base):
     dob = Column(Date)
     address = Column(String)
     phone = Column(String)
-    parents = Column(Text)
-    group_id = Column(String, ForeignKey('groups.id'))
+    group_id = Column(String)
 
     def __repr__(self):
         return f'<Student(ID={self.student_id}, First Name={self.first_name}, Second Name={self.second_name})>'

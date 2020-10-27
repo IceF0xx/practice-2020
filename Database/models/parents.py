@@ -3,8 +3,8 @@ from sqlalchemy import Column, String, Boolean, Text, Integer
 from Database.config import Base
 
 
-class Teachers(Base):
-    __tablename__ = 'teachers'
+class Parents(Base):
+    __tablename__ = 'parents'
 
     id = Column(Integer, primary_key=True)
     first_name = Column(String, nullable=False)  # Имя

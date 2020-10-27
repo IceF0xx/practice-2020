@@ -30,7 +30,6 @@ class Tabs(QWidget):
     def __init__(self, parent, tables):
         super(QWidget, self).__init__(parent)
 
-        tabs_number = 5
         self.layout = QVBoxLayout(self)
         self.tabs = QTabWidget()
         self.tabs.resize(300, 200)
