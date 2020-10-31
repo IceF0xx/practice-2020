@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Boolean, Text, Integer
-
+from ..config import tables
 from Database.config import Base
 
 
@@ -15,3 +15,5 @@ class Parents(Base):
 
     def __repr__(self):
         return f"<Teacher(ID={self.id}, First Name={self.first_name})>"
+
+tables[Parents.__tablename__] = Parents

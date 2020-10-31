@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, Date
-
+from ..config import tables
 from Database.config import Base
 
 
@@ -19,3 +19,5 @@ class Students(Base):
 
     def __repr__(self):
         return f'<Student(ID={self.student_id}, First Name={self.first_name}, Second Name={self.second_name})>'
+
+tables[Students.__tablename__] = Students

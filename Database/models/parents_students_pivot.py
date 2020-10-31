@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, ForeignKey
-
 from Database.config import Base
 
 
