@@ -1,6 +1,8 @@
 from PyQt5 import QtWidgets
-from .table import Table
+from PyQt5.QtWidgets import QHeaderView
+
 from Database.utils import fetch_data_from_table
+from .table import Table
 
 
 class Tab(QtWidgets.QWidget):
@@ -12,15 +14,10 @@ class Tab(QtWidgets.QWidget):
         lay.addStretch()
 
         self.table = QtWidgets.QTableView()
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-        data = fetch_data_from_table(table_name)
+        self.data = fetch_data_from_table(table_name)
 
-        self.model = Table(data)
+        self.model = Table(self.data, table_name)
         self.table.setModel(self.model)
-        # self.table.setHorizontalHeaderLabels(data['columns'])
-
         hlay.addWidget(self.table)
-
-
-
-

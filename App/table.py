@@ -1,42 +1,41 @@
-import typing
+from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex
 
-from PyQt5.QtCore import QAbstractTableModel, Qt
-from PyQt5 import QtCore
+from Database.utils import update_table_value
+
 
 class Table(QAbstractTableModel):
-    def __init__(self, data: dict):
+    def __init__(self, data: dict, table_name: str):
         super(Table, self).__init__()
+        self.table_name = table_name
         self._data = data['data']
         self._columns = data['columns']
 
-    def data(self, index, role):
+    def data(self, index, role: int = ...):
         if role == Qt.DisplayRole:
-            # See below for the nested-list data structure.
-            # .row() indexes into the outer list,
-            # .column() indexes into the sub-list
             return self._data[index.row()][index.column()]
 
-    def rowCount(self, index):
-        # The length of the outer list.
+    def rowCount(self, role: int = ...):
         return len(self._data)
 
-    def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
+    def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...):
         if role == Qt.DisplayRole:
             if orientation == Qt.Vertical:
                 return section
             elif orientation == Qt.Horizontal:
                 return self._columns[section]
 
-        if role == Qt.TextAlignmentRole:
-            return Qt.AlignCenter
-
-    def columnCount(self, index):
-        # The following takes the first sub-list, and returns
-        # the length (only works if all rows are an equal length)
+    def columnCount(self, index: int = ...):
         return len(self._columns)
 
-    def eventFilter(self, source, event):
-        if event.type() == QtCore.QEvent.MouseButtonRelease:
-            print('click')
+    def setData(self, index: QModelIndex, value, role: int = ...) -> bool:
+        self._data[index.row()][index.column()] = value
+        new_data = {'id': self._data[index.row()][0]}
+        new_data['new_value'] = value
+        new_data['column_name'] = self._columns[index.column()]
+        update_table_value(self.table_name, new_data)
+        return True
 
-        print('boop')
+    def flags(self, index: QModelIndex) -> Qt.ItemFlag:
+        if index.column() != 0:
+            return Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        return Qt.ItemIsSelectable
