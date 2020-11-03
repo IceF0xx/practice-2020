@@ -1,37 +1,70 @@
 import inspect
+from datetime import datetime
+from enum import Enum
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete, insert
 from sqlalchemy.inspection import inspect as sq_inspect
 
-from .config import tables, engine
+from .config import __tables, engine
+
+
+class Operation(Enum):
+    remove = 0
+    insert = 1
+    update = 2
 
 
 def get_table_names():
-    return tables
+    return __tables
 
 
-def fetch_data_from_table(table_name) -> dict:
+def exec(op: Operation, table_name, *args):
+    if op == Operation.remove:
+        return __remove_from_table(table_name, *args)
+    elif op == Operation.insert:
+        return __insert_data_in_table(table_name, *args)
+    else:
+        return __update_table_value(table_name, *args)
+
+
+def __remove_from_table(table_name, id_val):
     with engine.connect() as conn:
-        q = select([tables[table_name]])
-        return {'data': [list(row) for row in conn.execute(q)],
-                'columns': tables[table_name].__table__.columns.keys()}
-
-
-def update_table_value(table_name, updated_data):
-    with engine.connect() as conn:
-        table = tables[table_name]
-        primary_key = sq_inspect(table).primary_key[0]
-        column = get_column(table_name, updated_data['column_name'])
-
-        q = update(table) \
-            .where(primary_key == updated_data['id']) \
-            .values({column: updated_data['new_value']})
+        table = __tables[table_name]
+        id = get_primary_key(table)
+        q = delete(table).where(id == id_val)
 
         conn.execute(q)
 
 
+def __update_table_value(table_name, data):
+    with engine.connect() as conn:
+        table = __tables[table_name]
+        data['new_value'] = validate_input(data['new_value'])
+        id = get_primary_key(table)
+        column = get_column(table_name, data['column_name'])
+        q = update(table) \
+            .where(id == data['id']) \
+            .values({column: data['new_value']})
+        conn.execute(q)
+
+
+def __insert_data_in_table(table_name, data):
+    with engine.connect() as conn:
+        table = __tables[table_name]
+        data = list(map(lambda str: validate_input(str), data))
+        q = insert(table).values(data)
+        conn.execute(q)
+
+
+def fetch_data_from_table(table_name) -> dict:
+    with engine.connect() as conn:
+        q = select([__tables[table_name]])
+        return {'data': [list(row) for row in conn.execute(q)],
+                'columns': __tables[table_name].__table__.columns.keys()}
+
+
 def get_column(table_name, column_name):
-    table = tables[table_name]
+    table = __tables[table_name]
     attrs = inspect.getmembers(table, lambda param: not (inspect.isroutine(param)))
     column = list(filter(lambda a: not a[0].startswith('_')
                                    and a[0] != 'metadata'
@@ -39,3 +72,29 @@ def get_column(table_name, column_name):
                                    and a[0] == column_name, attrs))[0][1]
 
     return column
+
+
+def get_primary_key(table):
+    return sq_inspect(table).primary_key[0]
+
+
+def validate_input(str) -> object:
+    o = __string_to_date(str) or __string_to_bool(str)
+    if o:
+        return o
+
+    return str
+
+
+def __string_to_date(str):
+    try:
+        return datetime.strptime(str, '%d/%m/%Y')
+    except:
+        return None
+
+
+def __string_to_bool(val):
+    print(val)
+    if type(val) == str and val.lower() in ['true', 'false']:
+        return bool(val)
+    return None

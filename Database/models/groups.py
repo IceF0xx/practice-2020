@@ -1,6 +1,8 @@
 from sqlalchemy import Column, String, ForeignKey
-from ..config import tables
+
 from Database.config import Base
+from ..config import __tables
+
 
 class Groups(Base):
     __tablename__ = 'groups'
@@ -11,4 +13,5 @@ class Groups(Base):
     def __repr__(self):
         return f'<Group(id={self.id}, specialization={self.specialization})>'
 
-tables[Groups.__tablename__] = Groups
+
+__tables[Groups.__tablename__] = Groups

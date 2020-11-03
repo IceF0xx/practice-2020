@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Boolean
-from ..config import tables
+from sqlalchemy import Column, Integer, String
+
 from Database.config import Base
+from ..config import __tables
 
 
 class Users(Base):
@@ -8,6 +9,7 @@ class Users(Base):
 
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True)
-    is_admin = Column(Boolean)
+    role = Column(Integer)
 
-tables[Users.__tablename__] = Users
+
+__tables[Users.__tablename__] = Users

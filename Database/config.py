@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 
 DB_URL = 'sqlite:///college.db'
-tables = dict()
+__tables = dict()
 service_tables = ['students-parents', ]
 
 metadata = sa.MetaData()
