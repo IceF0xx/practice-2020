@@ -12,7 +12,7 @@ class TableModel(QAbstractTableModel):
 
     def data(self, index, role: int = ...):
         if role == Qt.DisplayRole:
-            return self._data[index.row()][index.column()]
+            return str(self._data[index.row()][index.column()])
 
     def rowCount(self, role: int = ...):
         return len(self._data)

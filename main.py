@@ -5,9 +5,9 @@ from App import MainWindow
 from Database.utils import get_table_names
 
 if __name__ == '__main__':
-    session = db.init()  # probably to delete
+    db.init()  # probably to delete
     app = QApplication([])
     tables = get_table_names()
-    window = MainWindow(tables)
+    window = MainWindow(tabs=tables)
     window.show()
     app.exec_()

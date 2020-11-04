@@ -83,7 +83,7 @@ def execute_raw_sql(sql_statement: str):
 def fetch_data_from_table(table_name) -> dict:
     with engine.connect() as conn:
         q = select([__tables[table_name]])
-        data = [list(map(lambda v: str(v) if v is not None else '', row)) for row in conn.execute(q)]
+        data = [list(row) for row in conn.execute(q)]
         return {'data': data,
                 'columns': __tables[table_name].__table__.columns.keys()}
 
