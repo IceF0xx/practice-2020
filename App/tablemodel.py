@@ -51,3 +51,6 @@ class TableModel(QAbstractTableModel):
             id = self._data[index.row()][0]
             exec(Operation.remove, self.table_name, id)
             self._data.pop(index.row())
+
+    def update_data(self, new_data):
+        self._data = new_data

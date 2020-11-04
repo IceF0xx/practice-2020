@@ -45,7 +45,10 @@ def __update_table_value(table_name, data):
         q = update(table) \
             .where(id == data['id']) \
             .values({column: data['new_value']})
-        conn.execute(q)
+        try:
+            conn.execute(q)
+        except:
+            print('invalid update value')
 
 
 def __insert_data_in_table(table_name, data):
@@ -56,10 +59,27 @@ def __insert_data_in_table(table_name, data):
         conn.execute(q)
 
 
+def execute_raw_sql(sql_statement: str):
+    with engine.connect() as conn:
+        try:
+            raw_data = conn.execute(sql_statement)
+            data = []
+            for row in raw_data:
+                data.append(list(row))
+
+            tokens = sql_statement.split(' ')
+            table_name_pos = tokens.index('from') + 1
+            table_name = tokens[table_name_pos]
+            return {'data': data, 'tablename': table_name}
+
+        except:
+            return {"error": 'true', "message": "invalid syntax"}
+
+
 def fetch_data_from_table(table_name) -> dict:
     with engine.connect() as conn:
         q = select([__tables[table_name]])
-        return {'data': [list(row) for row in conn.execute(q)],
+        return {'data': [list(map(lambda v: str(v), row)) for row in conn.execute(q)],
                 'columns': __tables[table_name].__table__.columns.keys()}
 
 
@@ -86,15 +106,14 @@ def validate_input(str) -> object:
     return str
 
 
-def __string_to_date(str):
+def __string_to_date(s: str):
     try:
-        return datetime.strptime(str, '%d/%m/%Y')
+        return datetime.strptime(s, '%d/%m/%Y')
     except:
         return None
 
 
 def __string_to_bool(val):
-    print(val)
     if type(val) == str and val.lower() in ['true', 'false']:
         return bool(val)
     return None
