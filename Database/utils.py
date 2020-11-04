@@ -1,6 +1,7 @@
 import inspect
 from datetime import datetime
 from enum import Enum
+from typing import Optional
 
 from sqlalchemy import select, update, delete, insert
 from sqlalchemy.inspection import inspect as sq_inspect
@@ -54,7 +55,7 @@ def __update_table_value(table_name, data):
 def __insert_data_in_table(table_name, data):
     with engine.connect() as conn:
         table = __tables[table_name]
-        data = list(map(lambda str: validate_input(str), data))
+        data = list(map(lambda str: validate_input(str), data[1:]))
         q = insert(table).values(data)
         conn.execute(q)
 
@@ -64,12 +65,15 @@ def execute_raw_sql(sql_statement: str):
         try:
             raw_data = conn.execute(sql_statement)
             data = []
-            for row in raw_data:
-                data.append(list(row))
 
-            tokens = sql_statement.split(' ')
-            table_name_pos = tokens.index('from') + 1
-            table_name = tokens[table_name_pos]
+            if sql_statement.split(' ')[0] == 'select':
+                for row in raw_data:
+                    data.append(list(row))
+
+                tokens = sql_statement.split(' ')
+                table_name_pos = tokens.index('from') + 1
+                table_name = tokens[table_name_pos]
+
             return {'data': data, 'tablename': table_name}
 
         except:
@@ -79,7 +83,8 @@ def execute_raw_sql(sql_statement: str):
 def fetch_data_from_table(table_name) -> dict:
     with engine.connect() as conn:
         q = select([__tables[table_name]])
-        return {'data': [list(map(lambda v: str(v), row)) for row in conn.execute(q)],
+        data = [list(map(lambda v: str(v) if v is not None else '', row)) for row in conn.execute(q)]
+        return {'data': data,
                 'columns': __tables[table_name].__table__.columns.keys()}
 
 
@@ -87,8 +92,6 @@ def get_column(table_name, column_name):
     table = __tables[table_name]
     attrs = inspect.getmembers(table, lambda param: not (inspect.isroutine(param)))
     column = list(filter(lambda a: not a[0].startswith('_')
-                                   and a[0] != 'metadata'
-                                   and a[0] != 'id'
                                    and a[0] == column_name, attrs))[0][1]
 
     return column
@@ -100,9 +103,8 @@ def get_primary_key(table):
 
 def validate_input(str) -> object:
     o = __string_to_date(str) or __string_to_bool(str)
-    if o:
+    if o is not None:
         return o
-
     return str
 
 
@@ -113,7 +115,7 @@ def __string_to_date(s: str):
         return None
 
 
-def __string_to_bool(val):
+def __string_to_bool(val) -> Optional[bool]:
     if type(val) == str and val.lower() in ['true', 'false']:
         return False if val.lower() == 'false' else True
     return None
