@@ -115,5 +115,5 @@ def __string_to_date(s: str):
 
 def __string_to_bool(val):
     if type(val) == str and val.lower() in ['true', 'false']:
-        return bool(val)
+        return False if val.lower() == 'false' else True
     return None
