@@ -15,7 +15,7 @@ class Operation(Enum):
     update = 2
 
 
-def get_table_names():
+def get_tables():
     return __tables
 
 
@@ -55,7 +55,7 @@ def __update_table_value(table_name, data):
 def __insert_data_in_table(table_name, data):
     with engine.connect() as conn:
         table = __tables[table_name]
-        data = list(map(lambda str: validate_input(str), data[1:]))
+        data = list(map(lambda str: validate_input(str), data[0:]))
         q = insert(table).values(data)
         conn.execute(q)
 

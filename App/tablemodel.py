@@ -1,3 +1,5 @@
+from datetime import date
+
 from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex
 
 from Database.utils import exec, Operation
@@ -12,7 +14,8 @@ class TableModel(QAbstractTableModel):
 
     def data(self, index, role: int = ...):
         if role == Qt.DisplayRole:
-            return str(self._data[index.row()][index.column()])
+            d = self._data[index.row()][index.column()]
+            return str(d) if type(d) == date else d
 
     def rowCount(self, role: int = ...):
         return len(self._data)
